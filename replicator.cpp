@@ -59,12 +59,24 @@ class point {
 
 } ;
 
+class shape {
+	public : 
+	vector<point> vertices;
+	
+	void inverse();
+	void add(point a){
+		vertices.push_back(a);
+	}
+};
+
 point tete;
 double z;
 ofstream file;
 double nw = 0.4;
 double taux = 0.1;
 double dia = 1.75;
+void polygnon(vector<point> poly);
+void polygnon(shape s);
 
 double extrud(double dist){
 	
@@ -223,6 +235,18 @@ void cercledelenfer(point centre , double bord){
 void polygnon(vector<point> poly){
 	int i = 0;
 	double tmp = 0;
+	move(poly[0]);
+	for(i = 0 ; i < poly.size(); i++){
+		tmp = (i+1)%poly.size();
+		line(poly[i],poly[tmp]);
+	//	cout << i<<endl;
+	}
+}
+
+void polygnon(shape s){
+	int i = 0;
+	double tmp = 0;
+	vector<point> poly = s.vertices;
 	move(poly[0]);
 	for(i = 0 ; i < poly.size(); i++){
 		tmp = (i+1)%poly.size();

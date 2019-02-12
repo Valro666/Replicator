@@ -30,7 +30,7 @@ class point {
 	double yy = a.y-y;
 	xx = xx*xx;
 	yy =yy*yy;
-	
+
 	double res = xx+yy;
 	res = sqrt(res);
 	
@@ -102,6 +102,13 @@ class shape {
         }
     };
     
+    void concat(shape s){
+        //shape s;
+        for(int i = 0 ;i < s.vertices.size();i++){
+        vertices.push_back(s.vertices[i]);
+        }
+    };
+    
     void melt(point a){
         shape s;
         for(int i = 0 ;i < vertices.size();i++){
@@ -156,8 +163,11 @@ ofstream file;
 double nw = 0.4;
 double taux = 0.1;
 double dia = 1.75;
+double nn = 0.5;
+
 void polygnon(vector<point> poly);
 void polygnon(shape s);
+
 
 double extrud(double dist){
 	
@@ -186,24 +196,15 @@ void line(point a , point b){
 }
 
 shape squarefill(){
-	double minx ;
-	double maxx ;
-	double miny ;
-	double maxy ;
-	//double y = 50;
+
 	shape fill ;
 
 	
 	double m = 0;
-	//fill.add(p);
 	int tour = 0 ;
     
     double pour = 5;
-    double bid = 0.2;
-    //double nn = extrud(bid)*M_PI*bid*bid*0.25;
-    double nn = 0.5;
     point p(50,50);
-    //p.translate(0.0,0.2);
     double y = 50;
     p.translate(0.0,nn);
     fill.add(p.duplicate());
@@ -213,28 +214,20 @@ shape squarefill(){
 		if(tour%2==1){
             t = p.duplicate();
             t.translate(-(10.0-nn-nn),0.0);
-            //p = m.jump(0,0);
-			}
+        }
 		else{
             t = p.duplicate();
             t.translate(10.0-nn-nn,0.0);
-			//p = m.jump(0,0);
-			}
+        }
         fill.add(t);
         p = t.duplicate();
-		//fill.add(p);
         p.translate(0.0,nn);
         fill.add(p.duplicate());
 		tour = (tour +1)%2;
 		y = y+nn;
 	}
-	
-	//fill.dellast();
 	fill.translate(nn,0.0);
 	return fill;
-	//polygnon(poly);
-	//polygnon(fill);
-	
 }
 
 shape square(){
@@ -249,38 +242,72 @@ shape square(){
 
 //G2 X Y I J E : XY centre IJ bord
 
-void cercledelenfer(point centre , double bord){
-	move(centre);
+shape cercledelenfer(point centre , double bord, double nb){
 	
+    shape s ;
 	vector<point> poly ;
-	//poly.push_back(centre);
-	//tete.go(b);
-	//file<<"G1 X"<<tete.x<<" Y"<<tete.y<<" Z"<<z<<" E1.0 F1200"<<endl;
-	//file<<"G1 X"<<tete.x<<" Y"<<tete.y<<" Z"<<z<<" E"<< extrud(a.dist(b))<<" F1200"<<endl;
-	
-	//file<<"G2 X"<<tete.x<<" Y"<<tete.y<<" I"<<bord<<" J"<<0.0<<" Z"<<z<<" E"<< extrud(2*M_PI*(bord))<<" F1200"<<endl;
-	
-	//file << "G2 X90.6 Y13.8 I5 J10 E22.4" << endl;
-	
-	//move(bord);
+
 	
 	double diametre = 2.0*M_PI*(bord);
 	
 	double x = centre.x+bord;
 	
-	//move(bord);
-	
-	for(double i = 0.0; i < 360 ; i = i+0.1){
+	double to = 360/nb;
+		
+	for(double i = 0.0; abs(i) < 360 ; i = i+to){
+	  
+	  
 		point p = centre.jump(0.0,0.0);
 		p.translate(bord,0.0);
 		p.rotate(centre,i);
-		poly.push_back(p);
+        s.add(p);
+	//	poly.push_back(p);
 		
 	}
 	
-	polygnon(poly);
+	point p = centre.jump(0.0,0.0);
+		p.translate(bord,0.0);
+		p.rotate(centre,360);
+        s.add(p);
+	//	poly.push_back(p);
 	
-	file<<"G92 E0.0"<<endl;
+	//polygnon(poly);
+	
+	//file<<"G92 E0.0"<<endl;
+    
+    return s;
+}
+
+shape cercledelenferfill(point centre , double bord, double nb){
+    shape s ;
+    
+    double to = nn;
+    
+    for(double i = bord ; i> 0 ; i = i-to){
+        shape tmp = cercledelenfer( centre ,  i,  nb);
+        s.concat(tmp);
+    }
+    
+    return s;
+}
+
+shape cercledelenferfill(point centre , double bord, double nb, double sens){
+    shape s ;
+    
+    double to = nn;
+    if(sens==1){
+        for(double i = bord ; i> 0 ; i = i-to){
+            shape tmp = cercledelenfer( centre ,  i,  nb);
+            s.concat(tmp);
+        }
+    }else{
+        for(double i = to ; i < bord ; i = i+to){
+            shape tmp = cercledelenfer( centre ,  i,  nb);
+            s.concat(tmp);
+        }
+    }
+    
+    return s;
 }
 
 void polygnon(vector<point> poly){
@@ -309,6 +336,7 @@ void polygnon(shape s){
 
 
 
+
 int main(){
 srand (time(NULL));
 	file.open("square.gcode");
@@ -325,27 +353,37 @@ srand (time(NULL));
    // printf("fghjkl");
     
     s.fusion(f);
+    
+    double discret = 180 ;
+    shape vint = cercledelenferfill(point(50,50),10,discret,0);
+    shape vext = cercledelenferfill(point(50,50),10,discret,1);
 
 	int tmp = 0 ;
 	for(double i = 0 ; i < 50 ;i++){
 
 		
 		z = i*taux;
+		
+		//cercledelenfer(point(50,50),10,360);
 
-        polygnon(s);
-		/*if(tmp == 0){
+        //polygnon(s);
+        
+	    //polygnon(s);
+		if(tmp == 0){
 		//squarefill();
-            //polygnon(f);
+        //polygnon(f);
+            polygnon(vint);
 		}else{
-			//polygnon(f);
+            polygnon(vext);
+        //polygnon(f);
 		//squarefill2();
-		}*/
+		}
         
         
         
 		//polygnon(f);
-        s.rotate(point(50.0,50.0),90.0);
-        s.translate(0.0,10.0);//*/
+        //s.rotate(point(50.0,50.0),90.0);
+        //s.translate(0.0,10.0);//*/
 		tmp = (tmp +1)%2;
 	}
 	//code

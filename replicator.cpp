@@ -161,7 +161,7 @@ point tete;
 double z;
 ofstream file;
 double nw = 0.4;
-double taux = 0.1;
+double taux = 0.2;
 double dia = 1.75;
 double nn = 0.5;
 
@@ -268,7 +268,7 @@ shape cercledelenfer(point centre , double bord, double nb){
 	point p = centre.jump(0.0,0.0);
 		p.translate(bord,0.0);
 		p.rotate(centre,360);
-        s.add(p);
+        //s.add(p);
 	//	poly.push_back(p);
 	
 	//polygnon(poly);
@@ -331,15 +331,12 @@ void polygnon(shape s){
 		line(poly[tmp],poly[i]);
 	//	cout << i<<endl;
 	}
+	
+	//file<<"G92 E0.0"<<endl;
 }
 
-
-
-
-
-int main(){
-srand (time(NULL));
-	file.open("square.gcode");
+void cube(){
+		file.open("cube.gcode");
 	tete.x = 0;
 	tete.y = 0;
 	//header
@@ -353,44 +350,75 @@ srand (time(NULL));
    // printf("fghjkl");
     
     s.fusion(f);
-    
+
+	int tmp = 0 ;
+	double taille = 10/taux;
+	for(double i = 0 ; i < taille ;i++){
+
+		z = i*taux;
+		
+		polygnon(s);
+        s.rotate(point(50.0,50.0),90.0);
+        s.translate(0.0,10.0);//*/
+		tmp = (tmp +1)%2;
+	}
+	file.close();
+}
+
+void cylindre(){
+		file.open("cylindre.gcode");
+	tete.x = 0;
+	tete.y = 0;
+	//header
+	file<<"G21"<<endl;
+	file<<"G90"<<endl;
+	file<<"G28"<<endl;
+
     double discret = 180 ;
     shape vint = cercledelenferfill(point(50,50),10,discret,0);
     shape vext = cercledelenferfill(point(50,50),10,discret,1);
 
 	int tmp = 0 ;
-	for(double i = 0 ; i < 50 ;i++){
+	double taille = 10/taux;
+	for(double i = 0 ; i < taille ;i++){
 
-		
 		z = i*taux;
 		
-		//cercledelenfer(point(50,50),10,360);
-
-        //polygnon(s);
-        
-	    //polygnon(s);
 		if(tmp == 0){
-		//squarefill();
-        //polygnon(f);
             polygnon(vint);
 		}else{
             polygnon(vext);
-        //polygnon(f);
-		//squarefill2();
 		}
-        
-        
-        
-		//polygnon(f);
-        //s.rotate(point(50.0,50.0),90.0);
-        //s.translate(0.0,10.0);//*/
 		tmp = (tmp +1)%2;
 	}
-	//code
-
-	
-	
 	file.close();
-	return 0;
+}
+
+
+
+int main(int argc, char *argv[]){
+	
+	switch(atoi(argv[1])){
+		case 1:
+			printf("creation d un cube dans cube.square");
+			cube();
+			printf("fin");
+			return 1 ;
+		case 2:
+			printf("creation d un cylindre dans cylindre.square");
+			cylindre();
+			printf("fin");
+			return 2 ;
+		break;
+		default : 
+		printf("cette operation n existe pas'");
+		return 0;
+		break; 
+		
+	}
+	
+	
+srand (time(NULL));
+return 0 ;
 	
 }

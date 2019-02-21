@@ -362,6 +362,7 @@ void cube(){
         s.translate(0.0,10.0);//*/
 		tmp = (tmp +1)%2;
 	}
+	end();
 	file.close();
 }
 
@@ -391,7 +392,16 @@ void cylindre(){
 		}
 		tmp = (tmp +1)%2;
 	}
+	end();
 	file.close();
+}
+
+void end(){
+	
+	
+	z = z + 150;
+	
+	move(point(0,0));
 }
 
 

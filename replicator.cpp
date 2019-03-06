@@ -5,12 +5,13 @@
 using namespace std;
 
 point tete;
-double z;  //hauteur tete
+double z = 0;  //hauteur tete
 ofstream file;
 double nw = 0.4; //diametre sortie
 double taux = 0.2;  // layer
 double dia = 1.75;  //
 double nn = 0.5; //
+double offz = 0;
 
 void polygnon(vector<point> poly);
 void polygnon(shape s);
@@ -31,7 +32,7 @@ double rand(double a, double b) {
 
 void move(point a) {
 	tete.go(a);
-	file << "G0 X" <<  tete.x << " Y" <<  tete.y << " Z" <<  z << " F3000" << endl;
+	file << "G0 X" <<  tete.x << " Y" <<  tete.y << " Z" <<  z+offz << " F3000" << endl;
 }
 
 void line(point a , point b) {
@@ -39,7 +40,7 @@ void line(point a , point b) {
 	tete.go(b);
 	double d = a.dist(b);
 	double ex = extrud(d);
-	file << "G1 X" <<  tete.x << " Y" <<  tete.y << " Z" << z << " E" <<  ex << " F1200" << endl;
+	file << "G1 X" <<  tete.x << " Y" <<  tete.y << " E" <<  ex << " F1200" << endl;
 	file << "G92 E0.0" << endl;
 }
 
@@ -465,7 +466,7 @@ void pyramide() {
 	//head();
 	double rayon = 20;
 	double taille = 20;
-	for (double i = 0 ; i < taille ; i = i + taux) {
+	for (double i = taux ; i < taille ; i = i + taux) {
 		z = i;
 		double comp = taille - i;
 		double r = (taille - comp) * rayon;
@@ -530,6 +531,14 @@ int main(int argc, char *argv[]) {
 		break;
 	default :
 		printf("cette operation n existe pas\n");
+		printf(" %s [case] \n",argv[0]);
+		printf("case : \n");
+		printf("\t1 creer le gcode d'un cube, ancienne methode\n");
+		printf("\t2 creer le gcode d'un cylindre\n");
+		printf("\t3 creer le gcode d'une hemisphere, calcul long\n");
+		printf("\t4 creer le gcode d'une pyramide, calcul long\n");
+		printf("\t5 creer le gcode d'un cube, nouvelle methode\n");
+		printf("\t6 creer le gcode d'un cube cheloux\n");
 		return 0;
 		break;
 

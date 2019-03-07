@@ -40,7 +40,7 @@ void line(point a , point b) {
 	tete.go(b);
 	double d = a.dist(b);
 	double ex = extrud(d);
-	file << "G1 X" <<  tete.x << " Y" <<  tete.y << " E" <<  ex << " F1200" << endl;
+	file << "G1 X" <<  tete.x << " Y" <<  tete.y << " Z" <<  z+offz << " E" <<  ex << " F1200" << endl;
 	file << "G92 E0.0" << endl;
 }
 
@@ -387,10 +387,33 @@ shape fillShapeY(shape sh) {
 	return s;
 }
 
+
+
+shape fill45(shape sh){
+    
+    	point minX = sh.minX();
+	point maxX = sh.maxX();
+	point maxY = sh.maxY();
+	point minY = sh.minY();
+        shape s ;
+        double actu ;
+        
+        
+        for(double x = minX.x ; x < (maxX.x*2) ; x = x + 0.1 ){
+            
+            point a = point(x,x);
+            if(sh.inside(a)){
+                s.add(a);
+            }
+            
+        }
+    return s;
+}
+
 void tricercle(double rayon = 20) {
-	shape ext = cercledelenfer(point(50, 50), rayon, rayon * 4);
-	shape int1 = cercledelenfer(point(50, 50), rayon-nw, rayon * 4);
-	shape int2 = cercledelenfer(point(50, 50), rayon-nw-nw, rayon * 4);
+	shape ext = cercledelenfer(point(50, 50), rayon, 30);
+	shape int1 = cercledelenfer(point(50, 50), rayon-nw, 30);
+	shape int2 = cercledelenfer(point(50, 50), rayon-nw-nw, 30);
 	shape ss = fillShapeX(int2);
 	polygnon(ext);
 	polygnon(int1);
@@ -414,11 +437,12 @@ void hemiv() {
 	file << "G90" << endl;
 	file << "G28" << endl;
 	//head();
-	double rayon = 20;
-	double taille = 20;
+	double rayon = 10;
+	double taille = 10;
 
 	for (double i = taux ; i <= taille ; i = i + taux) {
-		z = i;
+            printf("%f / %f \r",i , taille);
+            z = i;
 		double comp =  i;
 		double r = sqrt((rayon * rayon) - (comp * comp));
 		if (r > nw)
@@ -429,7 +453,7 @@ void hemiv() {
 
 void puzzle() {
 
-	file.open("hemi.gcode");
+	file.open("cubeG.gcode");
 	header();
 	tete.x = 0;
 	tete.y = 0;
@@ -441,15 +465,18 @@ void puzzle() {
 	//head();
 	double rayon = 20;
 	double taille = 20;
+        z = taux;
+        polygnon(fill45(s));
 
-	for (double i = taux ; i <= taille ; i = i + taux) {
+	/*for (double i = taux ; i <= taille ; i = i + taux) {
+             printf("%f / %f \r",i , taille);
 		z = i;
 		double comp =  i;
 		grille(s,0,0);
 		double r = sqrt((rayon * rayon) - (comp * comp));
 		if (r > nw)
 			tricercle(r);
-	}
+	}*/
 	endFunc();
 }
 
@@ -499,8 +526,8 @@ void pyramide() {
 	file << "G90" << endl;
 	file << "G28" << endl;
 	//head();
-	double rayon = 20;
-	double taille = 20;
+	double rayon = 2;
+	double taille = 2;
 	for (double i = taux ; i < taille ; i = i + taux) {
 		z = i;
 		double comp = taille - i;
@@ -560,7 +587,7 @@ int main(int argc, char *argv[]) {
 		return 4 ;
 		break;
 	case 6:
-		printf("creation d une forme dans puzzle.gcode\n");
+		printf("creation d une forme dans cubeG.gcode\n");
 		puzzle();
 		printf("\nfin");
 		return 4 ;

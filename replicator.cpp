@@ -775,7 +775,7 @@ void puzzle2() {
 
 void hemi4() {
 
-	file.open("hemi4.gcode");
+	file.open("hemi_adapt.gcode");
 	header();
 	tete.x = 0;
 	tete.y = 0;
@@ -901,6 +901,7 @@ int main(int argc, char *argv[]) {
 		printf("\t4 creer le gcode d'une pyramide, calcul long\n");
 		printf("\t5 creer le gcode d'un cube, nouvelle methode\n");
 		printf("\t6 creer le gcode d'un cube cheloux\n");
+		printf("\t6 creer le gcode d'une hemisphere adapt\n");
 		return 0;
 		break;
 

@@ -287,7 +287,7 @@ point tete;
 double z;  //hauteur tete
 ofstream file;
 double nw = 0.4; //diametre sortie
-double taux = 0.2;  // layer
+double taux = 0.3;  // layer 0.2
 double dia = 1.75;  //
 double nn = 0.5; //
 
@@ -625,6 +625,41 @@ void hemiv() {
 	endFunc();
 }
 
+void hemi4() {
+
+	file.open("hemi4.gcode");
+	header();
+	tete.x = 0;
+	tete.y = 0;
+	//header
+	file << "G21" << endl;
+	file << "G90" << endl;
+	file << "G28" << endl;
+	//head();
+	double rayon = 20;
+	double taille = 20;
+
+	// x*x + y*y = 1
+	//x*x = 1 - y*y
+	// x = sqrt(1-y*y)
+
+	for (double i = 0 ; i <= taille ; i = i + taux) {
+	
+		//z = i*taux;
+		z = i;
+		//double r = ((taille - (taille - z))*rayon)/taille;
+		double comp =  i;
+
+		double r = sqrt((rayon * rayon) - (comp * comp));
+		if (r > nw)
+			tricercle(r);
+
+		printf("%f %f \r", taille, z);
+		taux = 0.3 - i * 0.2/taille;
+	}
+	endFunc();
+}
+
 void pyramide() {
 
 	file.open("pyramide.gcode");
@@ -702,6 +737,13 @@ int main(int argc, char *argv[]) {
 		printf("\nfin");
 		return 4 ;
 		break;
+	case 5:
+		printf("creation d un hmsfr dans pyramide.gcode\n");
+		hemi4();
+		printf("\nfin");
+		return 4 ;
+		break;
+
 	default :
 		printf("cette operation n existe pas\n");
 		return 0;

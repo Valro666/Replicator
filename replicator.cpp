@@ -8,7 +8,7 @@ point tete;
 double z = 0;  //hauteur tete
 ofstream file;
 double nw = 0.4; //diametre sortie
-double taux = 0.2;  // layer
+double taux = 0.3;  // layer 0.2
 double dia = 1.75;  //
 double nn = 0.5; //
 double offz = 0;
@@ -480,6 +480,41 @@ void puzzle() {
 	endFunc();
 }
 
+void hemi4() {
+
+	file.open("hemi4.gcode");
+	header();
+	tete.x = 0;
+	tete.y = 0;
+	//header
+	file << "G21" << endl;
+	file << "G90" << endl;
+	file << "G28" << endl;
+	//head();
+	double rayon = 10;
+	double taille = 10;
+
+	// x*x + y*y = 1
+	//x*x = 1 - y*y
+	// x = sqrt(1-y*y)
+
+	for (double i = 0 ; i <= taille ; i = i + taux) {
+	
+		//z = i*taux;
+		z = i;
+		//double r = ((taille - (taille - z))*rayon)/taille;
+		double comp =  i;
+
+		double r = sqrt((rayon * rayon) - (comp * comp));
+		if (r > nw)
+			tricercle(r);
+
+		printf("%f %f \r", taille, z);
+		taux = 0.3 - i * 0.2/taille;
+	}
+	endFunc();
+}
+
 void pyramide() {
 
 	file.open("pyramide.gcode");
@@ -544,6 +579,7 @@ int main(int argc, char *argv[]) {
 		printf("\nfin");
 		return 4 ;
 		break;
+	
 	case 5:
 		printf("creation d une forme dans cubeV2.gcode\n");
 		cube2();
@@ -553,6 +589,12 @@ int main(int argc, char *argv[]) {
 	case 6:
 		printf("creation d une forme dans cubeG.gcode\n");
 		puzzle();
+		printf("\nfin");
+		return 4 ;
+		break;
+	case 7:
+		printf("creation d un hemi_adapt.gcode\n");
+		hemi4();
 		printf("\nfin");
 		return 4 ;
 		break;

@@ -464,8 +464,8 @@ void hemi4() {
 	file << "G90" << endl;
 	file << "G28" << endl;
 	//head();
-	double rayon = 20;
-	double taille = 20;
+	double rayon = 10;
+	double taille = 10;
 
 	// x*x + y*y = 1
 	//x*x = 1 - y*y

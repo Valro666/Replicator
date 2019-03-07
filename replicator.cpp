@@ -8,7 +8,7 @@ point tete;
 double z = 0;  //hauteur tete
 ofstream file;
 double nw = 0.4; //diametre sortie
-double taux = 0.3;  // layer 0.2
+double taux = 0.2;  // layer 0.2
 double dia = 1.75;  //
 double nn = 0.5; //
 double offz = 0;
@@ -84,6 +84,19 @@ shape square() {
 	poly.add(point(60, 60));
 	poly.add(point(60, 50));
 	poly.add(point(50, 50));
+	return poly;
+}
+
+shape square2(double larg) {
+	shape poly ;
+        
+        double a = 50;
+        double b = 50 + larg  ;
+	poly.add(point(a, a));
+	poly.add(point(a, b));
+	poly.add(point(b, b));
+	poly.add(point(b, a));
+	poly.add(point(a, a));
 	return poly;
 }
 
@@ -178,9 +191,27 @@ void polygnon(shape s) {
 	int i = 0;
 	double tmp = 0;
 	vector<point> poly = s.vertices;
+                    
 	move(s.vertices[0]);
 	for (i = 0 ; i < poly.size()-1; i++) {
+
 		line(s.vertices[i],s.vertices[i+1]);
+	}
+}
+
+void polygnon(vector<shape> sh) {
+	int i = 0;
+        
+        if(sh.size()==0){
+            cout<< "warning ! vector size null" <<endl;
+         return   ;
+        }
+        
+	//move(s.vertices[0]);
+	for (i = 0 ; i < sh.size(); i++) {
+
+		//line(s.vertices[i],s.vertices[i+1]);
+                polygnon(sh[i]);
 	}
 }
 
@@ -389,25 +420,207 @@ shape fillShapeY(shape sh) {
 
 
 
-shape fill45(shape sh){
-    
+vector<shape> grille45(shape sh,double pas){
     	point minX = sh.minX();
 	point maxX = sh.maxX();
 	point maxY = sh.maxY();
 	point minY = sh.minY();
-        shape s ;
-        double actu ;
+        bool first = true;
+        point last = point (10,10) ;
+        point f = point (10,10);
+        double delta = pas ;
         
-        
-        for(double x = minX.x ; x < (maxX.x*2) ; x = x + 0.1 ){
-            
-            point a = point(x,x);
-            if(sh.inside(a)){
-                s.add(a);
+        vector<shape> vs ;
+
+        for(double y = maxY.y-minY.y*2 ; y < maxY.y ; y = y  +delta){
+            for(double x = maxX.x-minX.x*2 ; x < maxX.x ; x = x +0.1 ){
+
+                double d = x+y;
+                point a = point(x,d);  
+                if(sh.inside(a)){
+                    if(first){
+                        f = a;
+                        first = false;
+                    }else{
+                        last = a;
+                    }
+                }
+            }
+            if(!first){
+                if(!f.equals(last)){
+                    
+                   if(sh.inside(f))
+                       if(sh.inside(last)){
+                   shape pp ;
+                   pp.add(f);
+                   pp.add(last);
+                   vs.push_back(pp);
+                   
+                       }
+                }
             }
             
+            first = true;
         }
-    return s;
+    return vs;
+}
+
+vector<shape> grillem45(shape sh,double pas){
+    	point minX = sh.minX();
+	point maxX = sh.maxX();
+	point maxY = sh.maxY();
+	point minY = sh.minY();
+        bool first = true;
+        point last = point (10,10) ;
+        point f = point (10,10);
+        double delta = pas ;
+        
+        vector<shape> vs ;
+    
+        for(double y = maxY.y-minY.y*2 ; y < maxY.y ; y = y  +delta){
+            for(double x = maxX.x-minX.x*2 ; x < maxX.x ; x = x +0.1 ){
+
+                double d = x + y;
+                point a = point(x,d);  
+                if(sh.inside(a)){
+                    if(first){
+                        f = a;
+                        first = false;
+                    }else{
+                        last = a;
+                    }
+                }
+            }
+            if(!first){
+                if(!f.equals(last)){
+                    
+                   if(sh.inside(f))
+                       if(sh.inside(last)){
+                   shape pp ;
+                   pp.add(f);
+                   pp.add(last);
+                   vs.push_back(pp);
+                   
+                       }
+                }
+            }
+            
+            first = true;
+        }
+    return vs;
+}
+
+vector<shape> grille0(shape sh,double pas){
+    	point minX = sh.minX();
+	point maxX = sh.maxX();
+	point maxY = sh.maxY();
+	point minY = sh.minY();
+        bool first = true;
+        point last = point (10,10) ;
+        point f = point (10,10);
+        double delta = pas ;
+        
+        vector<shape> vs ;
+        int i=0;
+
+        for(double x = minX.x+delta ; x <= maxX.x; x = x + delta){
+         
+            point a = point(x, minY.y+nw);
+            if(sh.inside(a)){
+                
+                i++;
+            cout << i << endl;
+                shape pp ;
+                pp.add(a);
+                pp.add(point(x,maxY.y-nw));
+                vs.push_back(pp);
+                
+         }
+        }
+        cout << vs.size() << endl;
+        
+    return vs;
+}
+
+vector<shape> grille0decal(shape sh,double pas,double dep){
+    	point minX = sh.minX();
+	point maxX = sh.maxX();
+	point maxY = sh.maxY();
+	point minY = sh.minY();
+        bool first = true;
+        point last = point (10,10) ;
+        point f = point (10,10);
+        double delta = pas ;
+        
+        vector<shape> vs ;
+        int i=0;
+
+        for(double x = minX.x+delta-dep ; x <= maxX.x; x = x + delta){
+         
+            point a = point(x, minY.y+nw);
+            if(sh.inside(a)){
+                
+                i++;
+            cout << i << endl;
+                shape pp ;
+                pp.add(a);
+                pp.add(point(x,maxY.y-nw));
+                vs.push_back(pp);
+                
+         }
+        }
+        cout << vs.size() << endl;
+        
+    return vs;
+}
+
+vector<shape> grille452(shape sh,double pas){
+    	point minX = sh.minX();
+	point maxX = sh.maxX();
+	point maxY = sh.maxY();
+	point minY = sh.minY();
+        bool first = true;
+        point last = point (10,10) ;
+        point f = point (10,10);
+        double delta = pas ;
+        
+        vector<shape> vs ;
+        int i=0;
+
+
+        for(double x = minX.x+delta ; x <= maxX.x; x = x + delta){
+            point a ;
+         for(double y = minY.y; y < maxY.y; y = y + 0.1){
+            point tmp = point(x+y, y);
+                if(sh.inside(a)){
+                        if(first){
+                            f = a;
+                            first = false;
+                        }else{
+                            last = a;
+                        }
+                    }
+         }
+         
+                     if(!first){
+                if(!f.equals(last)){
+                    
+                   if(sh.inside(f))
+                       if(sh.inside(last)){
+                   shape pp ;
+                   pp.add(f);
+                   pp.add(last);
+                   vs.push_back(pp);
+                   
+                       }
+                }
+            }
+            
+            first = true;
+        }
+        cout << vs.size() << endl;
+        
+    return vs;
 }
 
 void tricercle(double rayon = 20) {
@@ -451,6 +664,30 @@ void hemiv() {
 	endFunc();
 }
 
+vector<shape> dupli (vector<shape> sh){
+ 
+    vector<shape> vs ;
+    
+    for(int i = 0 ; i < sh.size(); i++){
+        vs.push_back(sh[i].duplicate());
+    }
+    
+    return vs;
+    
+}
+
+void rotate (vector<shape> sh, point centre , double angle){
+ 
+
+    
+    for(int i = 0 ; i < sh.size(); i++){
+        sh[i].rotate(centre,angle);
+    }
+    
+
+    
+}
+
 void puzzle() {
 
 	file.open("cubeG.gcode");
@@ -458,7 +695,52 @@ void puzzle() {
 	tete.x = 0;
 	tete.y = 0;
 	//header
-	shape s = square();
+	shape s = square2(20);
+        
+        //s.rotate(point(60,60),20);
+	//file << "M104 S190 ; set temperature\nM190 S60 ; wait for bed temperature to be reached\nM109 S190 ; wait for temperature to be reached\n" << endl;
+	file << "G21\n" <<"G90\n"<< "G28\n"<< "M104 S210\n"<< "M190 S60\n" <<"M109 S210\n" <<"M140 S60\n" <<"M105\n" <<"M106 S100\n" <<"G92 E0\n";
+
+	//head();
+	double rayon = 20;
+	double taille = 20;
+        z = taux;
+        double pas = 4;
+        vector<shape> gm45 = grillem45(s, pas);
+        vector<shape> g45 = dupli(gm45);
+
+            
+        //rotate(g45,point(60,60),30);
+            for(int i = 0 ; i < g45.size(); i++){
+        g45[i].rotate(point(60,60),90);
+    }
+        //vector<shape> g45 = grille45(s, pas);
+        
+        for(double h = taux ;  h < 10.0 ; h = h + taux){
+            z = h;
+        vector<shape> g0 = grille0decal(s, pas,0);
+        polygnon(s);
+        polygnon(gm45);
+        polygnon(g45);
+        polygnon(g0);
+        }
+        //polygnon(fill45(s));
+
+    
+	endFunc();
+}
+
+void puzzle2() {
+
+	file.open("cubeG.gcode");
+	header();
+	tete.x = 0;
+	tete.y = 0;
+	//header
+	shape s = square2(20);
+        
+        //s.rotate(point(60,60),20);
+	//file << "M104 S190 ; set temperature\nM190 S60 ; wait for bed temperature to be reached\nM109 S190 ; wait for temperature to be reached\n" << endl;
 	file << "G21" << endl;
 	file << "G90" << endl;
 	file << "G28" << endl;
@@ -466,17 +748,28 @@ void puzzle() {
 	double rayon = 20;
 	double taille = 20;
         z = taux;
-        polygnon(fill45(s));
+        double pas = 4;
+        vector<shape> gm45 = grillem45(s, pas);
+        vector<shape> g45 = dupli(gm45);
 
-	/*for (double i = taux ; i <= taille ; i = i + taux) {
-             printf("%f / %f \r",i , taille);
-		z = i;
-		double comp =  i;
-		grille(s,0,0);
-		double r = sqrt((rayon * rayon) - (comp * comp));
-		if (r > nw)
-			tricercle(r);
-	}*/
+            
+        //rotate(g45,point(60,60),30);
+            for(int i = 0 ; i < g45.size(); i++){
+        g45[i].rotate(point(60,60),90);
+    }
+        //vector<shape> g45 = grille45(s, pas);
+        
+        for(double h = taux ;  h < 10.0 ; h = h + taux){
+            z = h;
+        vector<shape> g0 = grille0decal(s, pas,h);
+        polygnon(s);
+        polygnon(gm45);
+        polygnon(g45);
+        polygnon(g0);
+        }
+        //polygnon(fill45(s));
+
+    
 	endFunc();
 }
 

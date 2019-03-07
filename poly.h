@@ -102,6 +102,7 @@ public :
 		for (int i = 0 ; i < vertices.size(); i++) {
 			s.add(vertices[i].duplicate());
 		}
+		return s;
 	};
 
 	void concat(shape s) {
